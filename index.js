@@ -28,17 +28,17 @@ function promptUser(){
           if (userChoice === 'View All Departments'){
                const sqlStatement = `SELECT * FROM departments;`;
 
-               dbConnect(sqlStatement).then(promptUser());
+               dbConnect(sqlStatement);
           }
           else if (userChoice === 'View All Roles'){
                const sqlStatement = `SELECT * FROM roles;`;
 
-               dbConnect(sqlStatement).then(promptUser());
+               dbConnect(sqlStatement);
           }
           else if (userChoice === 'View All Employees'){
                const sqlStatement = `SELECT * FROM employees;`;
 
-               dbConnect(sqlStatement).then(promptUser());
+               dbConnect(sqlStatement);
           }
           else if (userChoice === 'Add A Department'){
                inquirer.prompt([
@@ -59,7 +59,7 @@ function promptUser(){
                     const sqlStatement = `INSERT INTO departments (department_name)
                     VALUES
                     ('${deptName}');`
-                    dbConnect(sqlStatement).then(promptUser());
+                    dbConnect(sqlStatement);
                });
           }
           else if (userChoice === 'Add A Role'){
@@ -106,7 +106,7 @@ function promptUser(){
                     const sqlStatement = `INSERT INTO roles (title, salary, department_id)
                     VALUES
                     ('${roleName}', ${salary}, ${department});`
-                    dbConnect(sqlStatement).then(promptUser());
+                    dbConnect(sqlStatement);
                });
           }
           else if (userChoice === 'Add An Employee'){
@@ -170,7 +170,7 @@ function promptUser(){
                     const sqlStatement = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
                     VALUES
                     ('${firstName}','${lastName}', ${roleName}, ${managerID});`
-                    dbConnect(sqlStatement).then(promptUser());
+                    dbConnect(sqlStatement);
                })
           }
           else if (userChoice === 'Update Employee Role'){
@@ -236,7 +236,7 @@ function promptUser(){
                     console.log(newRole);
                     const sqlStatement = `UPDATE employees SET role_id = ${newRole}, manager_id = ${newManagerID} WHERE id = ${employeeID}; `
 
-                    dbConnect(sqlStatement).then(promptUser());
+                    dbConnect(sqlStatement);
                })
           }
      })
@@ -254,13 +254,10 @@ function dbConnect(query){
      });
 
      connection.promise().query(query)
-     .then( (results) => {
-          //let newResults = JSON.stringify(results);
-          //console.log(newResults);
-          let table = cTable.getTable([results]);
-          console.log(table);
+     .then( ([ results ]) => {
+          console.table(results);
      })
-     .catch(console.log)
+     .catch(console.log);   
 };
 
 promptUser();
