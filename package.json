@@ -21,6 +21,7 @@
     "express": "^4.17.1",
     "hide-secrets": "^2.0.0",
     "inquirer": "^8.0.0",
+    "mysql-wait": "^1.1.2",
     "mysql2": "^2.2.5"
   }
 }
