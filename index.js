@@ -7,6 +7,7 @@ function promptUser(){
           {
                type: 'list',
                name: 'userChoice',
+               message: 'What would you like to do?',
                loop: false,
                choices: [
                     'View All Departments',
@@ -269,10 +270,24 @@ function dbConnect(query){
 
      connection.promise().query(query)
      .then( ([ results ]) => {
+          console.log('\n')
+          console.log('==========================================\n');
           console.table(results);
+          console.log('==========================================\n');
+          inquirer.prompt([
+               {
+                    type: 'confirm',
+                    name: 'repeatCheck',
+                    message: 'Go back to the main menu?'
+               }
+          ]).then((res) => {
+               if(res.repeatCheck){promptUser()}
+               else {console.log('Ending sequence.')}
+          })
      })
-     .then(promptUser());
-     //.catch(console.log);   
+     .catch(console.log);   
+
+
 };
 
 promptUser();
