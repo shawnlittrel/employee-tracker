@@ -1,11 +1,6 @@
 const cTable = require('console.table');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
-//const db = require('./db/connection');
-
-
-
-
 
 function promptUser(){
      inquirer.prompt([
@@ -26,21 +21,28 @@ function promptUser(){
      ])
      .then(({ userChoice }) => {
           if (userChoice === 'View All Departments'){
+               //SQL Statement for generalized query
                const sqlStatement = `SELECT * FROM departments;`;
 
+               //Query database and output results
                dbConnect(sqlStatement);
           }
           else if (userChoice === 'View All Roles'){
+               //SQL Statement for generalized query
                const sqlStatement = `SELECT * FROM roles;`;
 
+               //Query database and output results
                dbConnect(sqlStatement);
           }
           else if (userChoice === 'View All Employees'){
+               //SQL Statement for generalized query
                const sqlStatement = `SELECT * FROM employees;`;
 
+               //Query database and output results
                dbConnect(sqlStatement);
           }
           else if (userChoice === 'Add A Department'){
+               //Acquire additional data
                inquirer.prompt([
                     {
                          type: 'input',
@@ -56,13 +58,17 @@ function promptUser(){
                          }
                     }
                ]).then(({ deptName }) => {
+                    //SQL Statement for generalized query
                     const sqlStatement = `INSERT INTO departments (department_name)
                     VALUES
                     ('${deptName}');`
+
+                    //Query database and output results
                     dbConnect(sqlStatement);
                });
           }
           else if (userChoice === 'Add A Role'){
+               //Acquire additional data
                inquirer.prompt([
                     {
                          type: 'input',
@@ -103,13 +109,17 @@ function promptUser(){
                          }
                     }
                ]).then(({ roleName, salary, department }) => {
+                    //SQL Statement for generalized query
                     const sqlStatement = `INSERT INTO roles (title, salary, department_id)
                     VALUES
                     ('${roleName}', ${salary}, ${department});`
+
+                    //Query database and output results
                     dbConnect(sqlStatement);
                });
           }
           else if (userChoice === 'Add An Employee'){
+               //Acquire additional data
                inquirer.prompt([
                     {
                          type: 'input',
@@ -167,13 +177,17 @@ function promptUser(){
                          }
                     }
                ]).then(({ firstName, lastName, roleName, managerID }) => {
+                    //SQL Statement for generalized query
                     const sqlStatement = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
                     VALUES
                     ('${firstName}','${lastName}', ${roleName}, ${managerID});`
+                    
+                    //Query database and output results
                     dbConnect(sqlStatement);
                })
           }
           else if (userChoice === 'Update Employee Role'){
+               //Acquire additional data
                inquirer.prompt([
                     {
                          type: 'input',
@@ -232,10 +246,10 @@ function promptUser(){
                          when: newManagerConfirm = true
                     }
                ]).then(({ employeeID, newRole, newManagerID }) => {
-                    console.log(employeeID);
-                    console.log(newRole);
+                    //SQL Statement for generalized query
                     const sqlStatement = `UPDATE employees SET role_id = ${newRole}, manager_id = ${newManagerID} WHERE id = ${employeeID}; `
 
+                    //Query database and output results
                     dbConnect(sqlStatement);
                })
           }
@@ -257,7 +271,8 @@ function dbConnect(query){
      .then( ([ results ]) => {
           console.table(results);
      })
-     .catch(console.log);   
+     .then(promptUser());
+     //.catch(console.log);   
 };
 
 promptUser();
