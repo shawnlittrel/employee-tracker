@@ -249,7 +249,7 @@ function dbConnect(query){
      const connection = mysql.createConnection({
           host: 'localhost',
           user: 'root',
-          password: 'Z41icwvjk!',
+          password: '',
           database: 'employee_tracker' 
      });
 
