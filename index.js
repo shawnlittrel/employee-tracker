@@ -2,6 +2,13 @@ const cTable = require('console.table');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 
+const connection = mysql.createConnection({
+     host: 'localhost',
+     user: 'root',
+     password: '',
+     database: 'employee_tracker' 
+});
+
 function promptUser(){
      inquirer.prompt([
           {
@@ -396,13 +403,6 @@ function promptUser(){
 };
 
 function dbConnect(query){
-     const connection = mysql.createConnection({
-          host: 'localhost',
-          user: 'root',
-          password: 'Z41icwvjk!',
-          database: 'employee_tracker' 
-     });
-
      connection.promise().query(query)
      .then( ([ results ]) => {
           console.log('\n')

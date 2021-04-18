@@ -26,6 +26,8 @@ A command line interface to view and manipulate data from an SQL database.
 ## Installation
 ---
 Clone the repository, then npm i to install dependencies.
+Seed the database by logging into your copy of mySQL, then running db.sql, schema.sql, and seeds.sql from the command line.
+Your password will need to be updated in index.js before running the program.
 
 
     
