@@ -13,10 +13,15 @@ function promptUser(){
                     'View All Departments',
                     'View All Roles',
                     'View All Employees',
+                    'View Employees By Manager', 
+                    'View Employees By Department',
                     'Add A Department',
                     'Add A Role',
                     'Add An Employee',
-                    'Update Employee Role'
+                    'Update Employee Role',
+                    'Update Employee Manager',
+                    'View Utilized Budget'
+                    
                ]
           }
      ])
@@ -30,17 +35,97 @@ function promptUser(){
           }
           else if (userChoice === 'View All Roles'){
                //SQL Statement for generalized query
-               const sqlStatement = `SELECT * FROM roles;`;
+               const sqlStatement = `
+               SELECT roles.id, roles.title, roles.salary, departments.department_name
+               FROM roles
+               LEFT JOIN departments
+               ON roles.department_id = departments.id;
+               `;
 
                //Query database and output results
                dbConnect(sqlStatement);
           }
           else if (userChoice === 'View All Employees'){
                //SQL Statement for generalized query
-               const sqlStatement = `SELECT * FROM employees;`;
+               const sqlStatement = `
+               SELECT e.id, e.first_name, e.last_name, r.title, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager_name
+               FROM employees e
+               LEFT JOIN roles r
+               ON e.role_id = r.id
+               INNER JOIN employees m
+               ON m.id = e.manager_id;
+               `;
 
                //Query database and output results
                dbConnect(sqlStatement);
+          }
+          else if (userChoice === 'View Employees By Manager'){
+               //Acquire additional info
+               inquirer.prompt([
+                    {
+                         type: 'list',
+                         name: 'managerSelect',
+                         message: 'Which manager would you like to filter by?',
+                         choices: [
+                              'Francesca January',
+                              'Misti Glasscock',
+                              'Winnie Catalano',
+                              'Jimmy Buchler'
+                         ],
+                         filter: function(choice){
+                              if(choice === 'Francesca January'){return 1}
+                              if(choice === 'Misti Glasscock'){return 2}
+                              if(choice === 'Winnie Catalano'){return 3}
+                              if(choice === 'Jimmy Buchler'){return 4}
+                         }
+                    }
+               ]).then(({ managerSelect }) => {
+                    const sqlStatement = `
+                    SELECT e.first_name, e.last_name, r.title, CONCAT(m.first_name, ' ', m.last_name) AS manager_name
+                    FROM employees e
+                    LEFT JOIN roles r
+                    ON e.role_id = r.id
+                    INNER JOIN employees m
+                    ON m.id = e.manager_id
+                    WHERE e.manager_id = ${managerSelect};
+                    `;
+
+                    dbConnect(sqlStatement);    
+               })
+
+          }
+          else if (userChoice === 'View Employees By Department'){
+               inquirer.prompt([
+                    {
+                         type: 'list',
+                         name: 'deptSelect',
+                         message: 'Which department would you like to filter by?',
+                         choices:[
+                             'Management',
+                             'Engineering',
+                             'Sales',
+                             'Installation',
+                             'Service' 
+                         ],
+                         filter: function(choice){
+                              if(choice === 'Management'){return 1}
+                              if(choice === 'Engineering'){return 2}
+                              if(choice === 'Sales'){return 3}
+                              if(choice === 'Installation'){return 4}
+                              if(choice === 'Service'){return 5}
+                         }
+                    }
+               ]).then(({ deptSelect }) => {
+                    const sqlStatement = `
+                    SELECT e.first_name, e.last_name, r.title
+                    FROM employees e
+                    LEFT JOIN roles r
+                    ON e.role_id = r.id
+                    WHERE r.department_id = ${deptSelect};
+                    `;
+
+                    dbConnect(sqlStatement);
+               })
           }
           else if (userChoice === 'Add A Department'){
                //Acquire additional data
@@ -223,13 +308,9 @@ function promptUser(){
                          }
                     },
                     {
-                         type: 'confirm',
-                         name: 'newManagerConfirm',
-                         message: 'Will the employee have a new manager?'
-                    },
-                    {
                          type: 'list',
                          name: 'newManagerID',
+                         message: `'Who is the employee's new manager?`,
                          choices:[
                               'Francesca January',
                               'Misti Glasscock',
@@ -244,13 +325,67 @@ function promptUser(){
                               if(choice === 'Jimmy Buchler'){return 4}
                               if(choice === 'None'){return NULL}
                          },
-                         when: newManagerConfirm = true
+                         
                     }
                ]).then(({ employeeID, newRole, newManagerID }) => {
                     //SQL Statement for generalized query
                     const sqlStatement = `UPDATE employees SET role_id = ${newRole}, manager_id = ${newManagerID} WHERE id = ${employeeID}; `
 
                     //Query database and output results
+                    dbConnect(sqlStatement);
+               })
+          }
+          else if (userChoice === 'Update Employee Manager'){
+               inquirer.prompt([
+                    {
+                         type: 'number',
+                         name: 'employeeSelect',
+                         message: 'What employee ID number would you like to modify?',
+                    },
+                    {
+                         type: 'number',
+                         name: 'managerSelect',
+                         message: 'What is the ID number of their new manager?',
+                    }
+               ]).then(({ employeeSelect, managerSelect }) => {
+                    const sqlStatement = `
+                    UPDATE employees
+                    SET manager_id = ${managerSelect}
+                    WHERE id = ${employeeSelect};
+                    `;
+                    dbConnect(sqlStatement);
+               })
+          }
+          else if (userChoice === 'View Utilized Budget'){
+               inquirer.prompt([
+                    {
+                         type: 'list',
+                         name: 'deptSelect',
+                         message: 'Which department would you like to filter by?',
+                         choices:[
+                             'Management',
+                             'Engineering',
+                             'Sales',
+                             'Installation',
+                             'Service' 
+                         ],
+                         filter: function(choice){
+                              if(choice === 'Management'){return 1}
+                              if(choice === 'Engineering'){return 2}
+                              if(choice === 'Sales'){return 3}
+                              if(choice === 'Installation'){return 4}
+                              if(choice === 'Service'){return 5}
+                         }
+                    }
+               ]).then(({ deptSelect }) => {
+                    const sqlStatement = `
+                    SELECT SUM(r.salary) AS BUDGET
+                    FROM employees e
+                    LEFT JOIN roles r
+                    ON e.role_id = r.id
+                    WHERE r.department_id = ${deptSelect};
+                    `;
+
                     dbConnect(sqlStatement);
                })
           }
